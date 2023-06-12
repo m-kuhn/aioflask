@@ -105,10 +105,14 @@ class WsgiToAsgiInstance:  # pragma: no cover
         status_code, _ = status.split(" ", 1)
         status_code = int(status_code)
         # Extract headers
-        headers = [
-            (name.lower().encode("ascii"), value.encode("ascii"))
-            for name, value in response_headers
-        ]
+        try:
+            headers = [
+                (name.lower().encode("ascii"), value.encode("ascii"))
+                for name, value in response_headers
+            ]
+        except ValueError as e:
+            raise ValueError(f'Could not encode all the headers in ascii {response_headers}')
+            
         # Build and send response start message.
         self.response_start = {
             "type": "http.response.start",
